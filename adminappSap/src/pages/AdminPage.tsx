@@ -4,7 +4,7 @@ import {
   Home, MapPin, Package, Users, Map, User, LogOut, 
   BarChart2, PlusCircle, Edit, Trash2, Search
 } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../hooks/useAuthHook';
 import { useDestinations } from '../hooks/useDestinations';
 import { usePackages } from '../hooks/usePackages';
 import { useGuides } from '../hooks/useGuides';
