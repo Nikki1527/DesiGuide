@@ -54,12 +54,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const checkUser = async () => {
     setLoading(true);
     try {
-      
       const stored = localStorage.getItem('desiguide_jwt');
       if (stored) {
         setUser(JSON.parse(stored));
+        setLoading(false);
         return;
       }
+      
+      // Check if environment variables are configured
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      if (!supabaseUrl || supabaseUrl === 'https://placeholder.supabase.co') {
+        console.warn('Supabase not configured. Skipping user check.');
+        setLoading(false);
+        return;
+      }
+      
       const { data } = await supabase.from('users').select('*').maybeSingle();
       if (data) setUser({ ...data, isAdmin: data.is_admin });
     } catch (err) {
@@ -96,6 +105,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setError(null);
 
     try {
+      // Check if Supabase is configured
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      if (!supabaseUrl || supabaseUrl.includes('placeholder')) {
+        throw new Error('Supabase is not configured. Please set up your .env file with valid credentials.');
+      }
+
       const { data, error } = await supabase
         .from('users')
         .select('*')
@@ -114,7 +129,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUser(userObj);
       localStorage.setItem('desiguide_jwt', JSON.stringify(userObj));
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Invalid email or password');
+      const errorMessage = err instanceof Error ? err.message : 'Invalid email or password';
+      setError(errorMessage);
       throw err;
     } finally {
       setLoading(false);

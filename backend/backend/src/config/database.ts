@@ -34,6 +34,9 @@ export class HanaConnection {
     const missing = (['host','user','password'] as (keyof DatabaseConfig)[])
       .filter(k => !this.config[k]);
     if (missing.length) {
+      console.error(`❌ Missing required DB config keys: ${missing.join(', ')}`);
+      console.error('Please configure your .env file with SAP HANA credentials.');
+      console.error('See .env.example for reference.');
       throw new Error(`Missing required DB config keys: ${missing.join(', ')}`);
     }
   }
